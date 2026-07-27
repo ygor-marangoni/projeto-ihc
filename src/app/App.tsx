@@ -34,7 +34,7 @@ type SubView =
 
 interface Student { id: string; name: string; email: string; enrollment: string; classIds: string[]; status: string; }
 interface Course { id: string; name: string; area: string; }
-interface Module { id: string; courseId: string; order: number; name: string; lessonCount: number; status: string; }
+interface Module { id: string; courseId: string; order: number; name: string; lessonCount: number; status: string; lessonNames?: string[]; }
 interface Lesson { id: string; moduleId: string; courseId: string; order: number; name: string; }
 interface Class { id: string; name: string; courseId: string; teacherId: string; studentIds: string[]; conductedLessons: string[]; schedule: string; status: string; currentModuleId?: string; }
 interface Question { id: string; courseId: string; moduleId: string; lessonId: string; text: string; difficulty: "easy" | "medium" | "hard"; answer: string; status: "ativa" | "inativa"; }
@@ -130,9 +130,14 @@ const lessonNames: Record<string, string[]> = {
   m6: ["O que é Marketing","Comportamento Online","Funil de Vendas","Personas","Branding","Inbound","Email Marketing","Conteúdo","SEO Básico","Métricas","Analytics","Social Media","Estratégia","Copywriting","Automação","CRM","Cases","Projeto Final"],
 };
 
+function getModuleLessonNames(module: Pick<Module, "id" | "lessonCount" | "lessonNames">) {
+  const defaults = lessonNames[module.id] ?? Array.from({ length: module.lessonCount }, (_, i) => `Lição ${i + 1}`);
+  return Array.from({ length: module.lessonCount }, (_, i) => module.lessonNames?.[i]?.trim() || defaults[i] || `Lição ${i + 1}`);
+}
+
 function generateLessons(modules: Module[]): Lesson[] {
   return modules.flatMap(mod => {
-    const names = lessonNames[mod.id] ?? Array.from({ length: mod.lessonCount }, (_, i) => `Lição ${i + 1}`);
+    const names = getModuleLessonNames(mod);
     return names.map((name, idx) => ({
       id: `${mod.id}-l${idx + 1}`, moduleId: mod.id, courseId: mod.courseId, order: idx + 1, name,
     }));
@@ -402,15 +407,14 @@ function Modal({ title, onClose, children, danger = false }: { title: string; on
 
 function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div className="absolute inset-0 bg-black/60 z-50 flex items-center px-4" onClick={onCancel}>
-      <div className="bg-card w-full rounded-2xl border border-slate-200 p-5" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"><AlertTriangle size={20} className="text-red-600" /></div>
-          <p className="text-sm text-foreground font-medium">{message}</p>
-        </div>
+    <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center px-4" onClick={onCancel}>
+      <div className="bg-card w-full max-w-sm mx-auto rounded-3xl border border-slate-200 p-6 shadow-2xl" onClick={e => e.stopPropagation()} role="alertdialog" aria-modal="true" aria-labelledby="delete-confirm-title">
+        <div className="w-12 h-12 mb-4 rounded-2xl bg-red-50 flex items-center justify-center"><Trash2 size={22} className="text-red-600" /></div>
+        <h3 id="delete-confirm-title" className="text-[17px] font-bold text-foreground mb-2" style={{ fontFamily: "'Figtree', sans-serif" }}>Confirmar exclusão</h3>
+        <p className="text-sm leading-5 text-muted-foreground mb-5">{message}</p>
         <div className="flex gap-2">
           <Btn variant="secondary" onClick={onCancel} className="flex-1">Cancelar</Btn>
-          <Btn variant="danger" onClick={onConfirm} className="flex-1">Confirmar</Btn>
+          <Btn variant="danger" onClick={onConfirm} className="flex-1"><Trash2 size={15} /> Excluir</Btn>
         </div>
       </div>
     </div>
@@ -471,7 +475,6 @@ const ADMIN_TABS = [
   { id: "admin-cursos",       label: "Cursos",        icon: BookOpen },
   { id: "admin-turmas",       label: "Turmas",        icon: Users },
   { id: "admin-pessoas",      label: "Pessoas",       icon: UserCheck },
-  { id: "chamada",            label: "Operacao",      icon: ClipboardCheck },
   { id: "admin-questoes",     label: "Questões",      icon: Database },
 ] as const;
 
@@ -659,10 +662,10 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
       {role === "admin" && onGoPedagogic && (
         <div className="relative z-10 mx-4 mt-4 bg-card rounded-2xl p-4 border border-border">
           <p className="font-bold text-sm mb-1" style={{ fontFamily: "'Figtree', sans-serif" }}>Operação Pedagógica</p>
-          <p className="text-xs text-muted-foreground mb-3">Acesso de administrador às rotinas de aulas, provas e relatórios.</p>
+          <p className="text-xs text-muted-foreground mb-3">Acesso de administrador às rotinas de aulas, avaliações e relatórios.</p>
           <div className="grid grid-cols-3 gap-2">
             <button onClick={() => onGoPedagogic("chamada")} className="rounded-2xl bg-blue-50 text-primary px-2 py-3 text-xs font-bold active:scale-[0.98]"><ClipboardCheck size={18} className="mx-auto mb-1" />Chamada</button>
-            <button onClick={() => onGoPedagogic("avaliacao")} className="rounded-2xl bg-orange-50 text-orange-700 px-2 py-3 text-xs font-bold active:scale-[0.98]"><Award size={18} className="mx-auto mb-1" />Provas</button>
+            <button onClick={() => onGoPedagogic("avaliacao")} className="rounded-2xl bg-orange-50 text-orange-700 px-2 py-3 text-xs font-bold active:scale-[0.98]"><Award size={18} className="mx-auto mb-1" />Avaliação</button>
             <button onClick={() => onGoPedagogic("relatorios")} className="rounded-2xl bg-green-50 text-green-700 px-2 py-3 text-xs font-bold active:scale-[0.98]"><BarChart2 size={18} className="mx-auto mb-1" />Relatórios</button>
           </div>
         </div>
@@ -791,6 +794,7 @@ function ChamadaHomeScreen({ role, classes, courses, students, professors, lesso
   const [classFilter, setClassFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [detailKey, setDetailKey] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ classId: string; lessonIds: string[]; date: string } | null>(null);
   const accessibleClasses = role === "professor" ? classes.filter(c => c.teacherId === currentProfessorId) : classes;
   const accessibleIds = new Set(accessibleClasses.map(c => c.id));
   const grouped = useMemo(() => {
@@ -871,7 +875,7 @@ function ChamadaHomeScreen({ role, classes, courses, students, professors, lesso
             <Btn fullWidth small onClick={() => { setDetailKey(null); onEditCall(detail.classId, detail.lessonIds, detail.date); }}>
               <Pencil size={14} /> Editar chamada
             </Btn>
-            <Btn fullWidth small variant="danger" onClick={() => { setDetailKey(null); onDeleteCall(detail.classId, detail.lessonIds, detail.date); }}>
+            <Btn fullWidth small variant="danger" onClick={() => { setDetailKey(null); setPendingDelete({ classId: detail.classId, lessonIds: detail.lessonIds, date: detail.date }); }}>
               <Trash2 size={14} /> Excluir chamada
             </Btn>
             {detail.records.map(record => {
@@ -900,6 +904,7 @@ function ChamadaHomeScreen({ role, classes, courses, students, professors, lesso
           </div>
         </Modal>
       )}
+      {pendingDelete && <ConfirmModal message="Deseja excluir esta chamada? As lições vinculadas voltarão a ficar disponíveis para registro." onConfirm={() => { onDeleteCall(pendingDelete.classId, pendingDelete.lessonIds, pendingDelete.date); setPendingDelete(null); }} onCancel={() => setPendingDelete(null)} />}
     </div>
   );
 }
@@ -2279,6 +2284,7 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
   const [expanded, setExpanded] = useState<string | null>(null);
   const [courseModal, setCourseModal] = useState<{ mode: "create" | "edit"; data: Partial<Course> } | null>(null);
   const [modModal, setModModal] = useState<{ mode: "create" | "edit"; courseId: string; data: Partial<Module> } | null>(null);
+  const [lessonModal, setLessonModal] = useState<{ moduleId: string; names: string[] } | null>(null);
   const [confirm, setConfirm] = useState<{ type: "course" | "module"; id: string } | null>(null);
 
   const emptyCourse = (): Partial<Course> => ({ name: "", area: "" });
@@ -2300,12 +2306,15 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
     if (!modModal) return;
     const d = modModal.data;
     if (!d.name?.trim()) return;
+    let createdModule: Module | null = null;
     if (modModal.mode === "create") {
-      setModules([...modules, { id: `mod-${uid()}`, courseId: modModal.courseId, name: d.name, order: d.order ?? 1, lessonCount: d.lessonCount ?? 18, status: d.status ?? "ativo" }]);
+      createdModule = { id: `mod-${uid()}`, courseId: modModal.courseId, name: d.name, order: d.order ?? 1, lessonCount: d.lessonCount ?? 18, status: d.status ?? "ativo" };
+      setModules([...modules, createdModule]);
     } else {
       setModules(modules.map(m => m.id === d.id ? { ...m, ...d } as Module : m));
     }
     setModModal(null);
+    if (createdModule) setLessonModal({ moduleId: createdModule.id, names: getModuleLessonNames(createdModule) });
   }
 
   function delMod(id: string) { setModules(modules.filter(m => m.id !== id)); setConfirm(null); }
@@ -2318,6 +2327,7 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
 
   const mf = modModal?.data ?? {};
   const cf = courseModal?.data ?? {};
+  const lessonModule = lessonModal ? modules.find(m => m.id === lessonModal.moduleId) : null;
 
   if (view === "questoes") {
     return <AdminQuestoesScreen questions={questions} setQuestions={setQuestions} courses={courses} modules={modules} onBack={() => setView("cursos")} />;
@@ -2354,6 +2364,7 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
                       <div key={m.id} className={`flex items-center gap-3 px-4 py-3 bg-muted/20 ${i >= 0 ? "border-t border-border" : ""}`}>
                         <div className="w-7 h-7 rounded-lg bg-white border border-border flex items-center justify-center text-xs font-bold">{m.order}</div>
                         <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate">{m.name}</p><p className="text-xs text-muted-foreground">{m.lessonCount} lições · <Badge className={m.status === "ativo" ? "bg-green-100 text-green-700 text-[10px]" : "bg-muted text-muted-foreground text-[10px]"}>{m.status}</Badge></p></div>
+                        <button onClick={() => setLessonModal({ moduleId: m.id, names: getModuleLessonNames(m) })} className="p-2 rounded-xl active:bg-blue-50" aria-label="Gerenciar lições"><BookMarked size={13} className="text-primary" /></button>
                         <button onClick={() => setModModal({ mode: "edit", courseId: course.id, data: { ...m } })} className="p-2 rounded-xl active:bg-muted"><Pencil size={13} className="text-muted-foreground" /></button>
                         <button onClick={() => setConfirm({ type: "module", id: m.id })} className="p-2 rounded-xl active:bg-red-50"><Trash2 size={13} className="text-red-500" /></button>
                       </div>
@@ -2401,6 +2412,26 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
         </Modal>
       )}
 
+      {lessonModal && lessonModule && (
+        <Modal title={`Lições — ${lessonModule.name}`} onClose={() => setLessonModal(null)}>
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-muted-foreground">Defina os nomes que aparecerão ao registrar a chamada desta turma.</p>
+            <div className="flex flex-col gap-2">
+              {lessonModal.names.map((name, index) => (
+                <div key={index} className="flex items-center gap-2 rounded-2xl border border-border bg-muted/20 px-3 py-2">
+                  <span className="w-7 h-7 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{index + 1}</span>
+                  <input value={name} onChange={e => setLessonModal(current => current && ({ ...current, names: current.names.map((lessonName, i) => i === index ? e.target.value : lessonName) }))} placeholder={`Lição ${index + 1}`} className="min-w-0 flex-1 bg-transparent py-1 text-sm font-medium outline-none placeholder:text-muted-foreground" />
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Btn variant="secondary" onClick={() => setLessonModal(null)} className="flex-1">Cancelar</Btn>
+              <Btn variant="success" onClick={() => { setModules(modules.map(m => m.id === lessonModal.moduleId ? { ...m, lessonNames: lessonModal.names } : m)); setLessonModal(null); }} className="flex-1"><Check size={15} /> Salvar lições</Btn>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {confirm?.type === "module" && <ConfirmModal message="Deseja excluir este módulo? Esta ação não pode ser desfeita." onConfirm={() => delMod(confirm.id)} onCancel={() => setConfirm(null)} />}
       {confirm?.type === "course" && <ConfirmModal message="Deseja excluir este curso e seus módulos? Esta ação não pode ser desfeita." onConfirm={() => delCourse(confirm.id)} onCancel={() => setConfirm(null)} />}
     </div>
@@ -2414,6 +2445,7 @@ function AdminQuestoesScreen({ questions, setQuestions, courses, modules, onBack
 }) {
   const [search, setSearch] = useState(""); const [filterDiff, setFilterDiff] = useState(""); const [filterCourse, setFilterCourse] = useState(""); const [filterModule, setFilterModule] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<Question | null>(null);
   const [newQ, setNewQ] = useState({ courseId: "", moduleId: "", lessonId: "", text: "", difficulty: "easy" as Question["difficulty"], answer: "", status: "ativa" as Question["status"] });
   const filtered = questions.filter(q =>
     (!filterDiff || q.difficulty === filterDiff) &&
@@ -2482,7 +2514,7 @@ function AdminQuestoesScreen({ questions, setQuestions, courses, modules, onBack
                 <div className="flex items-start gap-2 mb-2"><span className="text-xs text-muted-foreground font-bold mt-0.5 shrink-0">{i + 1}.</span><p className="text-sm flex-1">{q.text}</p></div>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-wrap gap-1"><Badge className={diffColors[q.difficulty]}>{diffLabels[q.difficulty]}</Badge><Badge className="bg-muted text-muted-foreground text-[10px]">M{mod?.order}·L{lesson?.order}</Badge><Badge className={q.status === "ativa" ? "bg-green-100 text-green-700 text-[10px]" : "bg-muted text-muted-foreground text-[10px]"}>{q.status}</Badge></div>
-                  <button onClick={() => setQuestions(questions.filter(x => x.id !== q.id))} className="p-2 rounded-xl active:bg-red-50"><Trash2 size={14} className="text-red-500" /></button>
+                  <button onClick={() => setQuestionToDelete(q)} className="p-2 rounded-xl active:bg-red-50" aria-label="Excluir questão"><Trash2 size={14} className="text-red-500" /></button>
                 </div>
                 {q.answer && <p className="text-xs text-green-700 mt-2 bg-green-50 rounded-xl px-3 py-1.5"><span className="font-semibold">R:</span> {q.answer}</p>}
               </div>
@@ -2490,6 +2522,7 @@ function AdminQuestoesScreen({ questions, setQuestions, courses, modules, onBack
           })}
         </div>
       </div>
+      {questionToDelete && <ConfirmModal message="Deseja excluir esta questão? Esta ação não pode ser desfeita." onConfirm={() => { setQuestions(questions.filter(q => q.id !== questionToDelete.id)); setQuestionToDelete(null); }} onCancel={() => setQuestionToDelete(null)} />}
     </div>
   );
 }
@@ -2554,6 +2587,22 @@ export default function App() {
   function showToast(msg: string, type: "success" | "error" = "success") { setToast({ msg, type }); }
   function clearSub() { setSubView(null); }
   function changeTab(t: Tab) { setTab(t); setSubView(null); }
+  function deleteCall(classId: string, lessonIds: string[], date: string) {
+    const callLessonId = lessonGroupId(lessonIds);
+    const remainingAttendance = attendance.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date));
+    const lessonsStillRecorded = new Set(
+      remainingAttendance
+        .filter(a => a.classId === classId)
+        .flatMap(getRecordLessonIds)
+    );
+
+    setAttendance(remainingAttendance);
+    setDailyAssessments(p => p.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date)));
+    setClasses(p => p.map(c => c.id === classId
+      ? { ...c, conductedLessons: c.conductedLessons.filter(lessonId => !lessonIds.includes(lessonId) || lessonsStillRecorded.has(lessonId)) }
+      : c));
+    showToast("Chamada excluída. As lições voltaram a ficar disponíveis.");
+  }
   const showBottomNav = subView === null;
 
   function renderContent() {
@@ -2623,11 +2672,7 @@ export default function App() {
         case "home":
           return <HomeScreen role="professor" courses={courses} classes={classes} students={students} periodic={periodic} professors={professors} currentProfessorId={currentProfessorId} onLogout={() => setRole(null)} />;
         case "chamada":
-          return <ChamadaHomeScreen role="professor" classes={classes} courses={courses} students={students} professors={professors} lessons={lessons} attendance={attendance} dailyAssessments={dailyAssessments} currentProfessorId={currentProfessorId} onSelectClass={classId => setSubView({ type: "chamada-lesson", classId })} onEditCall={(classId, lessonIds, date) => setSubView({ type: "chamada-register", classId, lessonIds, date })} onDeleteCall={(classId, lessonIds, date) => {
-            const callLessonId = lessonGroupId(lessonIds);
-            setAttendance(p => p.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date)));
-            setDailyAssessments(p => p.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date)));
-          }} />;
+          return <ChamadaHomeScreen role="professor" classes={classes} courses={courses} students={students} professors={professors} lessons={lessons} attendance={attendance} dailyAssessments={dailyAssessments} currentProfessorId={currentProfessorId} onSelectClass={classId => setSubView({ type: "chamada-lesson", classId })} onEditCall={(classId, lessonIds, date) => setSubView({ type: "chamada-register", classId, lessonIds, date })} onDeleteCall={deleteCall} />;
         case "avaliacao":
           return (
             <div className="flex flex-col flex-1 overflow-hidden">
@@ -2655,17 +2700,13 @@ export default function App() {
           return (
             <div className="flex flex-col flex-1 overflow-hidden">
               <TopBar title="Operação Pedagógica" onBack={() => changeTab("home")} rightSlot={<span className="text-xs text-muted-foreground">{todayBR()}</span>} />
-              <ChamadaHomeScreen role="admin" classes={classes} courses={courses} students={students} professors={professors} lessons={lessons} attendance={attendance} dailyAssessments={dailyAssessments} onSelectClass={classId => setSubView({ type: "chamada-lesson", classId })} onEditCall={(classId, lessonIds, date) => setSubView({ type: "chamada-register", classId, lessonIds, date })} onDeleteCall={(classId, lessonIds, date) => {
-                const callLessonId = lessonGroupId(lessonIds);
-                setAttendance(p => p.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date)));
-                setDailyAssessments(p => p.filter(a => !(a.classId === classId && lessonGroupId(getRecordLessonIds(a)) === callLessonId && a.date === date)));
-              }} />
+              <ChamadaHomeScreen role="admin" classes={classes} courses={courses} students={students} professors={professors} lessons={lessons} attendance={attendance} dailyAssessments={dailyAssessments} onSelectClass={classId => setSubView({ type: "chamada-lesson", classId })} onEditCall={(classId, lessonIds, date) => setSubView({ type: "chamada-register", classId, lessonIds, date })} onDeleteCall={deleteCall} />
             </div>
           );
         case "avaliacao":
           return (
             <div className="flex flex-col flex-1 overflow-hidden">
-              <TopBar title="Provas Pedagógicas" onBack={() => changeTab("home")} />
+              <TopBar title="Avaliação Pedagógica" onBack={() => changeTab("home")} />
               <AvaliacaoHome role="admin" classes={classes} courses={courses} modules={modules} students={students} periodic={periodic}
                 onStart={(classId, moduleId) => setSubView({ type: "avaliacao-config", classId, moduleId })} />
             </div>
