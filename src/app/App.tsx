@@ -6,7 +6,7 @@ import {
   Trash2, Pencil, GraduationCap, BookOpen, Users,
   BookMarked, Building2, Database, LogOut, ChevronDown,
   ClipboardList, Eye, EyeOff, Clock, UserCheck, LayoutDashboard,
-  ShieldCheck, KeyRound
+  ShieldCheck, KeyRound, Bell
 } from "lucide-react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, Radar,
@@ -335,7 +335,7 @@ function Btn({ children, onClick, variant = "primary", fullWidth = false, disabl
   fullWidth?: boolean; disabled?: boolean; small?: boolean; type?: "button" | "submit"; className?: string;
 }) {
   const base = `inline-flex items-center justify-center gap-2 font-semibold rounded-2xl transition-all active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-40 disabled:pointer-events-none ${fullWidth ? "w-full" : ""} ${small ? "px-3 py-2 text-sm" : "px-5 py-3 text-[15px]"}`;
-  const variants = { primary: "bg-primary text-white shadow-md shadow-blue-200", secondary: "bg-secondary text-secondary-foreground", danger: "bg-destructive text-white shadow-md shadow-red-100", ghost: "text-foreground hover:bg-muted", success: "bg-accent text-white shadow-md shadow-green-200" };
+  const variants = { primary: "bg-primary text-white", secondary: "bg-secondary text-secondary-foreground", danger: "bg-destructive text-white", ghost: "text-foreground hover:bg-muted", success: "bg-accent text-white" };
   return <button type={type} onClick={onClick} disabled={disabled} className={`${base} ${variants[variant]} ${className}`}>{children}</button>;
 }
 
@@ -389,9 +389,9 @@ function AvatarCircle({ name, size = "md", color = "blue" }: { name: string; siz
 function Modal({ title, onClose, children, danger = false }: { title: string; onClose: () => void; children: React.ReactNode; danger?: boolean }) {
   return (
     <div className="absolute inset-0 bg-black/60 z-50 flex items-end" onClick={onClose}>
-      <div className="bg-card w-full rounded-t-3xl shadow-2xl max-h-[88%] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full rounded-t-3xl border border-slate-200 max-h-[88%] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-border shrink-0">
-          <h3 className={`font-bold text-[17px] ${danger ? "text-red-600" : "text-foreground"}`} style={{ fontFamily: "'Nunito', sans-serif" }}>{title}</h3>
+          <h3 className={`font-bold text-[17px] ${danger ? "text-red-600" : "text-foreground"}`} style={{ fontFamily: "'Figtree', sans-serif" }}>{title}</h3>
           <button onClick={onClose} className="p-2 rounded-xl active:bg-muted transition-colors"><X size={20} className="text-muted-foreground" /></button>
         </div>
         <div className="overflow-y-auto flex-1 px-5 py-4">{children}</div>
@@ -403,7 +403,7 @@ function Modal({ title, onClose, children, danger = false }: { title: string; on
 function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className="absolute inset-0 bg-black/60 z-50 flex items-center px-4" onClick={onCancel}>
-      <div className="bg-card w-full rounded-2xl shadow-2xl p-5" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full rounded-2xl border border-slate-200 p-5" onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0"><AlertTriangle size={20} className="text-red-600" /></div>
           <p className="text-sm text-foreground font-medium">{message}</p>
@@ -422,7 +422,7 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 function Toast({ message, type = "success", onDone }: { message: string; type?: "success" | "error"; onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 2800); return () => clearTimeout(t); }, []);
   return (
-    <div className="absolute top-16 left-4 right-4 z-50 flex items-center gap-2 text-white text-sm rounded-2xl px-4 py-3 shadow-xl"
+    <div className="absolute top-16 left-4 right-4 z-50 flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-white"
       style={{ background: type === "error" ? "#dc2626" : "#111827", animation: "fadeSlideDown 0.3s ease" }}>
       {type === "success" ? <CheckCircle2 size={18} className="text-green-400 shrink-0" /> : <AlertTriangle size={18} className="text-yellow-300 shrink-0" />}
       {message}
@@ -451,7 +451,7 @@ function TopBar({ title, onBack, rightSlot }: { title: string; onBack?: () => vo
   return (
     <div className="flex items-center gap-2 px-4 py-3 bg-card/90 backdrop-blur-sm border-b border-border shrink-0">
       {onBack && <button onClick={onBack} className="p-2 -ml-2 rounded-xl active:bg-muted transition-colors" aria-label="Voltar"><ChevronLeft size={22} className="text-primary" /></button>}
-      <h1 className="flex-1 font-bold text-[17px] text-foreground" style={{ fontFamily: "'Nunito', sans-serif" }}>{title}</h1>
+      <h1 className="flex-1 font-bold text-[17px] text-foreground" style={{ fontFamily: "'Figtree', sans-serif" }}>{title}</h1>
       {rightSlot}
     </div>
   );
@@ -478,13 +478,13 @@ const ADMIN_TABS = [
 function BottomNav({ role, tab, setTab }: { role: UserRole; tab: Tab; setTab: (t: Tab) => void }) {
   const tabs = role === "admin" ? ADMIN_TABS : PROF_TABS;
   return (
-    <div className="flex items-end bg-card/95 backdrop-blur-md border-t border-border shrink-0 pb-2">
+    <div className="flex items-end bg-white border-t border-slate-200 shrink-0 px-1 pt-3 pb-2">
       {tabs.map(({ id, label, icon: Icon }) => {
         const active = tab === id;
         return (
-          <button key={id} onClick={() => setTab(id as Tab)} className={`flex-1 flex flex-col items-center gap-0.5 pt-2 pb-1 transition-all ${active ? "text-primary" : "text-muted-foreground"}`} aria-current={active ? "page" : undefined}>
-            <div className={`p-1.5 rounded-xl transition-all ${active ? "bg-primary/10" : ""}`}><Icon size={22} strokeWidth={active ? 2.5 : 1.8} /></div>
-            <span className={`text-[10px] font-semibold ${active ? "text-primary" : ""}`}>{label}</span>
+          <button key={id} onClick={() => setTab(id as Tab)} className={`flex-1 flex min-w-0 flex-col items-center gap-0 transition-all ${active ? "text-primary" : "text-muted-foreground"}`} aria-current={active ? "page" : undefined}>
+            <div className={`flex h-[40px] w-[58px] items-center justify-center rounded-[9px] transition-all duration-200 ${active ? "mb-1 bg-primary text-white" : "bg-transparent"}`}><Icon size={21} strokeWidth={active ? 2.1 : 1.8} /></div>
+            <span className={`text-[11px] font-semibold leading-4 ${active ? "text-primary" : "text-muted-foreground"}`}>{label}</span>
           </button>
         );
       })}
@@ -513,25 +513,24 @@ function LoginScreen({ onLogin, professors }: { onLogin: (r: UserRole, userId?: 
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-gradient-to-b from-primary/5 to-background overflow-y-auto">
-      <div className="flex flex-col items-center pt-10 pb-6 px-6 text-center">
-        <img src="/logo vertical.svg" alt="Aprender+" className="h-24 w-auto object-contain mb-4" />
+    <div className="flex flex-col flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-b from-blue-50 via-background to-indigo-50/60">
+      <div className="flex flex-col items-center px-6 pb-5 pt-9 text-center">
+        <img src="/logo vertical.svg" alt="Aprender+" className="mb-0 h-20 w-auto object-contain" />
         <h1 className="sr-only">Aprender+</h1>
-        <p className="text-muted-foreground text-sm mt-1.5">Sistema de Gestão Educacional</p>
-        <p className="text-xs text-muted-foreground/70 mt-1">150 Unidades · 50+ Cursos · 10.000 Alunos</p>
+        <p className="mt-1 text-[14.5px] font-semibold text-slate-700">Sistema de Gestão Educacional</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-5 flex flex-col gap-4 pb-8">
+      <form onSubmit={handleSubmit} className="mx-4 mb-6 flex flex-col gap-4 rounded-[24px] border border-slate-200 bg-card p-5">
         {/* Role selection */}
         <div>
           <p className="text-sm font-bold text-foreground mb-2">Perfil de acesso <span className="text-red-500">*</span></p>
           <div className="flex gap-2">
             {([["professor", "Professor", BookMarked, "blue"], ["admin", "Administrador", Building2, "green"]] as const).map(([r, label, Icon, color]) => (
               <button key={r} type="button" onClick={() => { setRole(r); setError(""); }}
-                className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${role === r ? (color === "blue" ? "border-primary bg-blue-50" : "border-accent bg-green-50") : "border-border bg-card"}`}>
-                <Icon size={24} className={role === r ? (color === "blue" ? "text-primary" : "text-accent") : "text-muted-foreground"} />
-                <span className={`text-sm font-bold ${role === r ? (color === "blue" ? "text-primary" : "text-accent") : "text-muted-foreground"}`}>{label}</span>
-                {role === r && <div className={`w-4 h-4 rounded-full flex items-center justify-center ${color === "blue" ? "bg-primary" : "bg-accent"}`}><Check size={10} className="text-white" /></div>}
+                className={`relative flex flex-1 flex-col items-center gap-2 rounded-2xl border-2 py-3 transition-all active:scale-[0.98] ${role === r ? (color === "blue" ? "border-primary bg-blue-50" : "border-accent bg-green-50") : "border-border bg-card"}`}>
+                <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${role === r ? (color === "blue" ? "bg-blue-100" : "bg-green-100") : "bg-slate-100"}`}><Icon size={21} className={role === r ? (color === "blue" ? "text-primary" : "text-accent") : "text-muted-foreground"} /></span>
+                <span className={`text-sm font-medium ${role === r ? (color === "blue" ? "text-primary" : "text-accent") : "text-muted-foreground"}`}>{label}</span>
+                {role === r && <div className={`absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full ${color === "blue" ? "bg-primary" : "bg-accent"}`}><Check size={10} className="text-white" /></div>}
               </button>
             ))}
           </div>
@@ -561,12 +560,20 @@ function LoginScreen({ onLogin, professors }: { onLogin: (r: UserRole, userId?: 
 function HomeScreen({ role, courses, classes, students, periodic, professors, currentProfessorId, onLogout, onGoPedagogic }: {
   role: UserRole; courses: Course[]; classes: Class[]; students: Student[]; periodic: PeriodicAssessment[]; professors: Professor[]; currentProfessorId?: string; onLogout: () => void; onGoPedagogic?: (tab: ProfTab) => void;
 }) {
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const myClasses = role === "professor" ? classes.filter(c => c.teacherId === currentProfessorId) : classes;
   const totalStudents = [...new Set(myClasses.flatMap(c => c.studentIds))].length;
   const pendingCount = myClasses.filter(c => {
     const group = Math.ceil(c.conductedLessons.length / 6);
     return group > 0 && !periodic.some(p => p.classId === c.id && p.group === group);
   }).length;
+  const notifications = myClasses.filter(c => {
+    const group = Math.ceil(c.conductedLessons.length / 6);
+    return group > 0 && !periodic.some(p => p.classId === c.id && p.group === group);
+  }).map(c => ({ id: c.id, title: "Avaliação periódica pendente", description: `${c.name} está pronta para avaliação.` }));
+  const visibleNotifications = role === "admin" && pendingCount > 0
+    ? [{ id: "admin-pending", title: "Avaliações para acompanhar", description: `${pendingCount} ${pendingCount === 1 ? "avaliação periódica aguarda" : "avaliações periódicas aguardam"} acompanhamento.` }]
+    : notifications;
 
   // Use index-based keys ("T1", "T2"…) — recharts uses `name` as internal tick key,
   // so any string collision (two classes with similar names) would cause duplicate-key warnings.
@@ -576,18 +583,36 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
   }));
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto pb-2">
-      <div className="px-5 pt-4 pb-5 bg-gradient-to-br from-primary to-blue-700 text-white">
+    <div className="relative min-h-0 flex-1 overflow-hidden">
+      <div className="app-scrollbar h-full overflow-x-hidden overflow-y-auto pb-2">
+      <div className="relative overflow-hidden px-5 pt-4 pb-2 bg-gradient-to-br from-[#2563eb] via-[#1d4ed8] to-[#172554] text-white">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-sm text-blue-100">Bom dia,</p>
-            <p className="text-xl font-black" style={{ fontFamily: "'Nunito', sans-serif" }}>
+            <p className="text-xl font-bold" style={{ fontFamily: "'Figtree', sans-serif" }}>
               {role === "admin" ? "Administrador" : (professors.find(p => p.id === currentProfessorId)?.name.split(" ")[0] ?? "Professor")}
             </p>
             <p className="text-xs text-blue-200 mt-0.5">{todayBR()}</p>
           </div>
-          <button onClick={onLogout} className="p-2 rounded-xl bg-white/20 active:bg-white/30 transition-colors" aria-label="Sair"><LogOut size={18} className="text-white" /></button>
+          <div className="relative flex items-center gap-2">
+            <button onClick={() => setNotificationsOpen(v => !v)} className="relative p-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors" aria-label="Notificações" aria-expanded={notificationsOpen}>
+              <Bell size={18} className="text-white" />
+              {visibleNotifications.length > 0 && <span className="absolute -right-1 -top-1 min-w-4 h-4 px-1 rounded-full bg-orange-400 text-[10px] leading-4 font-black text-white">{visibleNotifications.length}</span>}
+            </button>
+            <button onClick={onLogout} className="p-2 rounded-xl bg-white/20 active:bg-white/30 transition-colors" aria-label="Sair"><LogOut size={18} className="text-white" /></button>
+            {notificationsOpen && <div className="hidden absolute inset-x-0 bottom-0 z-50 max-h-[78vh] overflow-hidden rounded-t-[28px] border border-slate-200 bg-white text-slate-900">
+              <div className="border-b border-slate-100 px-4 py-3"><p className="font-extrabold text-sm">Notificações</p><p className="text-[11px] text-slate-500">Atualizações importantes para você</p></div>
+              <div className="max-h-64 overflow-y-auto">{visibleNotifications.length === 0 ? <div className="px-4 py-8 text-center"><CheckCircle2 size={26} className="mx-auto mb-2 text-green-500" /><p className="text-sm font-bold">Tudo em dia</p><p className="mt-1 text-xs text-slate-500">Não há notificações pendentes.</p></div> : visibleNotifications.map(n => <button key={n.id} onClick={() => { setNotificationsOpen(false); onGoPedagogic?.("avaliacao"); }} className="flex w-full gap-3 border-b border-slate-100 px-4 py-3 text-left hover:bg-blue-50"><span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600"><Award size={16} /></span><span><span className="block text-xs font-extrabold">{n.title}</span><span className="mt-1 block text-xs text-slate-500">{n.description}</span><span className="mt-1 block text-[10px] font-semibold text-orange-600">Ação necessária · Ver avaliações</span></span></button>)}</div>
+              <button onClick={() => setNotificationsOpen(false)} className="w-full px-4 py-3 text-xs font-bold text-slate-500 hover:bg-slate-50">Fechar painel</button>
+            </div>}
+          </div>
         </div>
+        {false && notificationsOpen && <div className="absolute inset-0 z-40 bg-slate-950/30 notification-overlay" onClick={() => setNotificationsOpen(false)} />}
+        {false && notificationsOpen && <div className="absolute inset-x-0 bottom-0 z-50 max-h-[78vh] overflow-hidden rounded-t-[28px] border border-slate-200 bg-white text-slate-900 notification-sheet">
+          <button onClick={() => setNotificationsOpen(false)} className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 active:bg-slate-200" aria-label="Fechar notificações"><X size={20} /></button>
+          <div className="border-b border-slate-100 px-5 py-4"><p className="font-extrabold text-base">Notificações</p><p className="text-xs text-slate-500">Atualizações importantes para você</p></div>
+          <div className="max-h-[58vh] overflow-y-auto">{visibleNotifications.length === 0 ? <div className="px-5 py-12 text-center"><CheckCircle2 size={30} className="mx-auto mb-2 text-green-500" /><p className="text-sm font-bold">Tudo em dia</p></div> : visibleNotifications.map(n => <button key={n.id} onClick={() => { setNotificationsOpen(false); onGoPedagogic?.("avaliacao"); }} className="flex w-full gap-3 border-b border-slate-100 px-5 py-4 text-left active:bg-blue-50"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600"><Award size={18} /></span><span><span className="block text-sm font-extrabold">{n.title}</span><span className="mt-1 block text-sm text-slate-500">{n.description}</span><span className="mt-2 block text-xs font-semibold text-orange-600">Ação necessária · Ver avaliações</span></span></button>)}</div>
+        </div>}
         {role === "admin" ? (
           <div className="grid grid-cols-4 gap-2">
             {([
@@ -596,8 +621,8 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
               { v: professors.filter(p => p.status === "ativo").length, l: "Professores" },
               { v: courses.length, l: "Cursos" },
             ] as const).map(s => (
-              <div key={s.l} className="rounded-2xl p-2.5 text-center bg-white/20">
-                <p className="text-xl font-black">{s.v}</p>
+              <div key={s.l} className="rounded-2xl border border-white/10 p-2.5 text-center bg-white/15">
+                <p className="text-xl font-bold">{s.v}</p>
                 <p className="text-[10px] text-blue-50 font-medium">{s.l}</p>
               </div>
             ))}
@@ -609,16 +634,22 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
               { v: totalStudents, l: "Alunos", alert: false },
               { v: pendingCount, l: "Pendentes", alert: pendingCount > 0 },
             ] as const).map(s => (
-              <div key={s.l} className={`rounded-2xl p-3 text-center ${s.alert ? "bg-orange-400/90" : "bg-white/20"}`}>
-                <p className="text-2xl font-black">{s.v}</p>
+              <div key={s.l} className={`rounded-2xl border border-white/10 px-3 pt-3 pb-2 text-center ${s.alert ? "bg-orange-500" : "bg-white/15"}`}>
+                <p className="text-2xl font-bold">{s.v}</p>
                 <p className="text-[11px] text-blue-50 font-medium">{s.l}</p>
               </div>
             ))}
           </div>
         )}
       </div>
+      <div className="relative z-0 h-0 w-full">
+      <svg className="absolute -left-[0.1%] top-0 block h-[72px] w-[100.2%] max-w-none" viewBox="0 0 390 72" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="header-wave" x1="0" y1="0" x2="390" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#1D4ED7" /><stop offset="13.94%" stopColor="#1D4ACC" /><stop offset="31.25%" stopColor="#1C42AF" /><stop offset="46.63%" stopColor="#1B3C9D" /><stop offset="61.06%" stopColor="#1A3688" /><stop offset="75.48%" stopColor="#193077" /><stop offset="86.54%" stopColor="#192C68" /><stop offset="100%" stopColor="#182658" /></linearGradient></defs>
+        <path d="M0 0H390V16C314 54 257 60 195 53C128 45 60 54 0 18Z" fill="url(#header-wave)" />
+      </svg>
+      </div>
 
-      {pendingCount > 0 && role === "professor" && (
+      {false && pendingCount > 0 && role === "professor" && (
         <div className="mx-4 mt-4 flex items-center gap-2 p-3 rounded-2xl bg-orange-50 border border-orange-200 text-orange-700 text-sm">
           <AlertTriangle size={16} className="shrink-0" />
           <span><strong>{pendingCount}</strong> avaliação{pendingCount > 1 ? "ões" : ""} periódica{pendingCount > 1 ? "s" : ""} pendente{pendingCount > 1 ? "s" : ""}</span>
@@ -626,7 +657,7 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
       )}
 
       {role === "admin" && onGoPedagogic && (
-        <div className="mx-4 mt-4 bg-card rounded-2xl p-4 border border-border shadow-sm">
+        <div className="relative z-10 mx-4 mt-4 bg-card rounded-2xl p-4 border border-border">
           <p className="font-bold text-sm mb-1" style={{ fontFamily: "'Figtree', sans-serif" }}>Operação Pedagógica</p>
           <p className="text-xs text-muted-foreground mb-3">Acesso de administrador às rotinas de aulas, provas e relatórios.</p>
           <div className="grid grid-cols-3 gap-2">
@@ -637,8 +668,8 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
         </div>
       )}
 
-      <div className="mx-4 mt-4 bg-card rounded-2xl p-4 border border-border shadow-sm">
-        <p className="font-bold text-sm mb-3" style={{ fontFamily: "'Nunito', sans-serif" }}>Progresso das Turmas</p>
+      <div className="relative z-10 mx-4 mt-4 bg-card rounded-[22px] p-4 border border-slate-200">
+        <div className="mb-3 flex items-center justify-between"><p className="text-[15px] font-semibold" style={{ fontFamily: "'Figtree', sans-serif" }}>Progresso das Turmas</p><span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">Visão geral</span></div>
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eef2ff" />
@@ -653,14 +684,14 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
       {role === "admin" ? (
         /* Admin: recent turmas overview */
         <div className="mx-4 mt-4">
-          <p className="font-bold text-sm mb-2" style={{ fontFamily: "'Nunito', sans-serif" }}>Visão Geral — Turmas</p>
+          <p className="font-bold text-sm mb-2" style={{ fontFamily: "'Figtree', sans-serif" }}>Visão Geral — Turmas</p>
           <div className="flex flex-col gap-2">
             {myClasses.map(cl => {
               const course = courses.find(c => c.id === cl.courseId);
               const prof = professors.find(p => p.id === cl.teacherId);
               const pct = Math.round((cl.conductedLessons.length / 180) * 100);
               return (
-                <div key={cl.id} className="bg-card rounded-2xl p-4 border border-border shadow-sm">
+                <div key={cl.id} className="bg-card rounded-2xl p-4 border border-border">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><Users size={18} /></div>
                     <div className="flex-1 min-w-0">
@@ -685,13 +716,13 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
       ) : (
         /* Professor: my classes */
         <div className="mx-4 mt-4">
-          <p className="font-bold text-sm mb-2" style={{ fontFamily: "'Nunito', sans-serif" }}>Minhas Turmas</p>
+          <p className="font-bold text-sm mb-2" style={{ fontFamily: "'Figtree', sans-serif" }}>Minhas Turmas</p>
           <div className="flex flex-col gap-2">
             {myClasses.map(cl => {
               const course = courses.find(c => c.id === cl.courseId);
               const pct = Math.round((cl.conductedLessons.length / 180) * 100);
               return (
-                <div key={cl.id} className="bg-card rounded-2xl p-4 border border-border shadow-sm">
+                <div key={cl.id} className="bg-card rounded-2xl p-4 border border-border">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><BookMarked size={18} /></div>
                     <div className="flex-1 min-w-0">
@@ -711,6 +742,13 @@ function HomeScreen({ role, courses, classes, students, periodic, professors, cu
         </div>
       )}
       <div className="h-4" />
+      </div>
+      {notificationsOpen && <div className="absolute inset-0 z-40 bg-slate-950/30 notification-overlay" onClick={() => setNotificationsOpen(false)} />}
+      {notificationsOpen && <div className="absolute inset-x-0 bottom-0 z-50 max-h-[78vh] overflow-hidden rounded-t-[28px] border border-slate-200 bg-white text-slate-900 notification-sheet">
+        <button onClick={() => setNotificationsOpen(false)} className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 active:bg-slate-200" aria-label="Fechar notificações"><X size={20} /></button>
+        <div className="border-b border-slate-100 px-5 py-4"><p className="font-extrabold text-base">Notificações</p><p className="text-xs text-slate-500">Atualizações importantes para você</p></div>
+        <div className="max-h-[58vh] overflow-y-auto">{visibleNotifications.length === 0 ? <div className="px-5 py-12 text-center"><CheckCircle2 size={30} className="mx-auto mb-2 text-green-500" /><p className="text-sm font-bold">Tudo em dia</p></div> : visibleNotifications.map(n => <button key={n.id} onClick={() => { setNotificationsOpen(false); onGoPedagogic?.("avaliacao"); }} className="flex w-full gap-3 border-b border-slate-100 px-5 py-4 text-left active:bg-blue-50"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600"><Award size={18} /></span><span><span className="block text-sm font-extrabold">{n.title}</span><span className="mt-1 block text-sm text-slate-500">{n.description}</span><span className="mt-2 block text-xs font-semibold text-orange-600">Ação necessária · Ver avaliações</span></span></button>)}</div>
+      </div>}
     </div>
   );
 }
@@ -727,10 +765,10 @@ function ChamadaList({ role, classes, courses, currentProfessorId, onSelectClass
           const course = courses.find(c => c.id === cl.courseId);
           return (
             <button key={cl.id} onClick={() => onSelectClass(cl.id)}
-              className="flex items-center gap-3 p-4 rounded-2xl bg-card border-2 border-border active:border-primary active:bg-blue-50/50 transition-all text-left shadow-sm group focus:outline-none focus:ring-2 focus:ring-primary/40">
+              className="flex items-center gap-3 p-4 rounded-2xl bg-card border-2 border-border active:border-primary active:bg-blue-50/50 transition-all text-left group focus:outline-none focus:ring-2 focus:ring-primary/40">
               <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><Users size={22} /></div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-[15px]" style={{ fontFamily: "'Nunito', sans-serif" }}>{cl.name}</p>
+                <p className="font-bold text-[15px]" style={{ fontFamily: "'Figtree', sans-serif" }}>{cl.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{course?.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{cl.studentIds.length} aluno{cl.studentIds.length > 1 ? "s" : ""} · {cl.conductedLessons.length} lições</p>
               </div>
@@ -802,7 +840,7 @@ function ChamadaHomeScreen({ role, classes, courses, students, professors, lesso
               const lesson = lessons.find(l => l.id === g.lessonId);
               const lessonLabel = lessonGroupLabel(g.lessonIds, lessons);
               return (
-                <button key={g.key} onClick={() => setDetailKey(g.key)} className="bg-card rounded-2xl border border-border p-4 text-left shadow-sm active:scale-[0.98]">
+                <button key={g.key} onClick={() => setDetailKey(g.key)} className="bg-card rounded-2xl border border-border p-4 text-left active:scale-[0.98]">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><Clock size={18} /></div>
                     <div className="flex-1 min-w-0">
@@ -1039,7 +1077,7 @@ function ChamadaRegisterScreen({ classId, lessonIds, date = todayISO(), classes,
             const okCount = isPresent ? Object.values(daily[student.id] ?? {}).filter(Boolean).length : 0;
 
             return (
-              <div key={student.id} className={`rounded-2xl border-2 overflow-hidden shadow-sm transition-all ${isPresent ? "border-green-200" : isAbsent ? "border-red-200" : "border-border"} bg-card`}>
+              <div key={student.id} className={`rounded-2xl border-2 overflow-hidden transition-all ${isPresent ? "border-green-200" : isAbsent ? "border-red-200" : "border-border"} bg-card`}>
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <AvatarCircle name={student.name} color={isPresent ? "green" : isAbsent ? "red" : "blue"} />
                   <div className="flex-1 min-w-0">
@@ -1174,7 +1212,7 @@ function AvaliacaoHome({ role, classes, courses, modules, students, periodic, cu
               const mod = modules.find(m => m.id === p.moduleId);
               const gi = gradeInfo(p.total);
               return (
-                <div key={p.id} className="flex items-center gap-3 bg-card rounded-2xl px-4 py-3 border border-border shadow-sm">
+                <div key={p.id} className="flex items-center gap-3 bg-card rounded-2xl px-4 py-3 border border-border">
                   <AvatarCircle name={student?.name ?? "?"} size="sm" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{student?.name}</p>
@@ -1191,11 +1229,11 @@ function AvaliacaoHome({ role, classes, courses, modules, students, periodic, cu
       <div className="px-4 pb-4">
         {onManageQuestions && (
           <div className="mb-3">
-            <Btn fullWidth variant="secondary" onClick={onManageQuestions}><Database size={16} /> Elaborar questoes</Btn>
+            <Btn fullWidth variant="secondary" onClick={onManageQuestions} className="border border-blue-200 bg-blue-50 py-3.5 text-blue-700 hover:bg-blue-100"><Pencil size={17} /> Elaborar questões</Btn>
           </div>
         )}
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Nova Avaliação</p>
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-4 flex flex-col gap-4">
+        <div className="bg-card rounded-2xl border border-border p-4 flex flex-col gap-4">
           <SelField label="Turma" value={selectedClass} onChange={v => { setSelectedClass(v); setSelectedModule(""); }}
             options={myClasses.map(c => ({ value: c.id, label: c.name }))} required />
           {selectedClass && (
@@ -1358,7 +1396,7 @@ function AvaliacaoSummaryScreen({ classId, moduleId, selectedQuestions, counts, 
     <div className="flex flex-col flex-1 overflow-hidden relative">
       <TopBar title="Prova Gerada" onBack={onBack} />
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="bg-card rounded-2xl border border-border p-4 shadow-sm mb-3">
+        <div className="bg-card rounded-2xl border border-border p-4 mb-3">
           <p className="text-xs text-muted-foreground">{currentClass.name}</p>
           <p className="font-bold text-sm">{course?.name}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Módulo {mod?.order}: {mod?.name}</p>
@@ -1371,7 +1409,7 @@ function AvaliacaoSummaryScreen({ classId, moduleId, selectedQuestions, counts, 
           <div className="rounded-2xl bg-red-50 text-red-700 p-3 text-center"><p className="text-xl font-black">{counts.hard}</p><p className="text-[10px] font-bold">Difíceis</p></div>
         </div>
         <p className="text-sm font-bold mb-2">Perguntas sorteadas</p>
-        <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           {selectedQuestions.map((q, i) => (
             <div key={q.id} className={`px-4 py-3 ${i > 0 ? "border-t border-border" : ""}`}>
               <div className="flex items-start gap-2">
@@ -1576,7 +1614,7 @@ function AvaliacaoDoneScreen({ classId, moduleId, group, students, modules, peri
           const student = students.find(s => s.id === p.studentId);
           const gi = gradeInfo(p.total);
           return (
-            <div key={p.id} className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 shadow-sm">
+            <div key={p.id} className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3">
               <AvatarCircle name={student?.name ?? "?"} />
               <div className="flex-1 min-w-0"><p className="font-semibold text-sm truncate">{student?.name}</p><div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5"><Mail size={11} /> envio pelo relatório</div></div>
               <div className="text-right shrink-0"><p className="text-2xl font-black">{p.total}</p><Badge className={gi.cls}>{gi.label}</Badge></div>
@@ -1605,7 +1643,7 @@ function RelatorioList({ role, students, classes, currentProfessorId, periodic, 
         <div className="relative">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar aluno ou matrícula..."
-            className="w-full rounded-2xl border border-border bg-card pl-10 pr-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm" />
+            className="w-full rounded-2xl border border-border bg-card pl-10 pr-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-primary/40" />
         </div>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -1616,7 +1654,7 @@ function RelatorioList({ role, students, classes, currentProfessorId, periodic, 
             const avg = sPerf.length === 0 ? null : Math.round(sPerf.reduce((x, p) => x + p.total, 0) / sPerf.length);
             return (
               <button key={s.id} onClick={() => onSelect(s.id)}
-                className="flex items-center gap-3 bg-card rounded-2xl border border-border p-4 text-left active:scale-[0.98] transition-all shadow-sm group focus:outline-none">
+                className="flex items-center gap-3 bg-card rounded-2xl border border-border p-4 text-left active:scale-[0.98] transition-all group focus:outline-none">
                 <AvatarCircle name={s.name} />
                 <div className="flex-1 min-w-0"><p className="font-semibold text-sm truncate">{s.name}</p><p className="text-xs text-muted-foreground">Mat. {s.enrollment} · {s.classIds.length} turma{s.classIds.length > 1 ? "s" : ""}</p></div>
                 {avg !== null ? <div className="text-right shrink-0"><p className="text-lg font-black">{avg}</p><Badge className={gradeInfo(avg).cls}>{gradeInfo(avg).label}</Badge></div> : <Badge className="bg-muted text-muted-foreground shrink-0">Sem dados</Badge>}
@@ -1741,13 +1779,13 @@ function RelatorioDetail({ studentId, students, classes, courses, modules, perio
 
         {sPerf.length > 0 && (
           <>
-            <div className="mx-4 mt-4 bg-card rounded-2xl border border-border p-4 flex items-center justify-between shadow-sm">
+            <div className="mx-4 mt-4 bg-card rounded-2xl border border-border p-4 flex items-center justify-between">
               <div><p className="text-sm text-muted-foreground">Conceito Atual</p><p className="text-3xl font-black">{avg}</p></div>
               <Badge className={`${gi.cls} text-base px-4 py-1.5`}>{gi.label}</Badge>
             </div>
 
             {radarData.length > 0 && (
-              <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4 shadow-sm">
+              <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4">
                 <p className="font-bold text-sm mb-2">Perfil de Competências</p>
                 <ResponsiveContainer width="100%" height={180}>
                   <RadarChart data={radarData}><PolarGrid stroke="#eef2ff" /><PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} /><Radar name="Aluno" dataKey="A" stroke="#2563eb" fill="#2563eb" fillOpacity={0.2} /></RadarChart>
@@ -1755,7 +1793,7 @@ function RelatorioDetail({ studentId, students, classes, courses, modules, perio
               </div>
             )}
 
-            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border overflow-hidden">
               <div className="px-4 py-3 border-b border-border"><p className="font-bold text-sm">Tabela Comparativa</p></div>
               {GRADE_TABLE.map((row, i) => {
                 const isCurrent = gi.label === row.label;
@@ -1768,12 +1806,12 @@ function RelatorioDetail({ studentId, students, classes, courses, modules, perio
               })}
             </div>
 
-            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4 shadow-sm">
+            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4">
               <p className="font-bold text-sm mb-1">Feedback/observações</p>
               <p className="text-sm text-muted-foreground whitespace-pre-line">{lastFeedback || "Sem observações registradas na última avaliação."}</p>
             </div>
 
-            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4 shadow-sm">
+            <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4">
               <p className="text-xs text-muted-foreground">E-mail cadastrado</p>
               <p className="text-sm font-semibold mb-3">{student.email}</p>
               <Btn fullWidth variant="success" onClick={sendEmail}><Mail size={16} /> Enviar relatório por e-mail</Btn>
@@ -1786,7 +1824,7 @@ function RelatorioDetail({ studentId, students, classes, courses, modules, perio
                   const mod = modules.find(m => m.id === p.moduleId);
                   const gi2 = gradeInfo(p.total);
                   return (
-                    <div key={p.id} className="bg-card rounded-2xl border border-border px-4 py-3 shadow-sm">
+                    <div key={p.id} className="bg-card rounded-2xl border border-border px-4 py-3">
                       <div className="flex-1"><p className="text-sm font-semibold">Módulo {mod?.order} · Grupo {p.group}</p><p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleDateString("pt-BR")}</p>{p.emailSent && <div className="flex items-center gap-1 text-xs text-green-600 mt-0.5"><Mail size={10} /> e-mail enviado</div>}</div>
                       <div className="text-right"><p className="text-2xl font-black">{p.total}</p><Badge className={gi2.cls}>{gi2.label}</Badge></div>
                       <button onClick={() => setEditingAssessment(p)} className="mt-3 w-full rounded-xl bg-blue-50 text-primary px-3 py-2 text-xs font-bold active:scale-[0.98]">
@@ -1887,7 +1925,7 @@ function AdminTurmasScreen({ classes, setClasses, students, setStudents, courses
             const course = courses.find(c => c.id === cl.courseId);
             const pct = Math.round((cl.conductedLessons.length / 180) * 100);
             return (
-              <div key={cl.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+              <div key={cl.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-start gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><Users size={18} /></div>
                   <div className="flex-1 min-w-0">
@@ -2015,7 +2053,7 @@ function AdminAlunosScreen({ students, setStudents, classes, setClasses, courses
           {filtered.map(s => {
             const sClasses = classes.filter(c => s.classIds.includes(c.id));
             return (
-              <div key={s.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+              <div key={s.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center gap-3">
                   <AvatarCircle name={s.name} />
                   <div className="flex-1 min-w-0">
@@ -2136,7 +2174,7 @@ function AdminProfessoresScreen({ professors, setProfessors, classes, setClasses
           {filtered.map(prof => {
             const profClasses = classes.filter(c => prof.classIds.includes(c.id));
             return (
-              <div key={prof.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+              <div key={prof.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm ${prof.status === "ativo" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}`}>
                     {initials(prof.name)}
@@ -2299,7 +2337,7 @@ function AdminCursosScreen({ courses, setCourses, modules, setModules, questions
             const mods = modules.filter(m => m.courseId === course.id);
             const isExp = expanded === course.id;
             return (
-              <div key={course.id} className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+              <div key={course.id} className="bg-card rounded-2xl border border-border overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-4">
                   <button onClick={() => setExpanded(isExp ? null : course.id)}
                     className="flex items-center gap-3 min-w-0 flex-1 text-left active:bg-muted/40 transition-colors rounded-xl">
@@ -2400,7 +2438,7 @@ function AdminQuestoesScreen({ questions, setQuestions, courses, modules, onBack
       <TopBar title="Banco de Questões" onBack={onBack} rightSlot={<button onClick={() => setShowForm(v => !v)} className="p-2 rounded-xl bg-primary text-white active:scale-90"><Plus size={18} /></button>} />
       <div className="flex-1 overflow-y-auto">
         {showForm && (
-          <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4 shadow-sm">
+          <div className="mx-4 mt-3 bg-card rounded-2xl border border-border p-4">
             <p className="font-bold text-sm mb-3">Nova Questão</p>
             <div className="flex flex-col gap-3">
               <SelField value={newQ.courseId} onChange={v => setNewQ(q => ({ ...q, courseId: v, moduleId: "", lessonId: "" }))} options={courses.map(c => ({ value: c.id, label: c.name }))} label="Curso" required />
@@ -2440,7 +2478,7 @@ function AdminQuestoesScreen({ questions, setQuestions, courses, modules, onBack
             const lesson = generateLessons(modules).find(l => l.id === q.lessonId);
             const mod = modules.find(m => m.id === q.moduleId);
             return (
-              <div key={q.id} className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+              <div key={q.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-start gap-2 mb-2"><span className="text-xs text-muted-foreground font-bold mt-0.5 shrink-0">{i + 1}.</span><p className="text-sm flex-1">{q.text}</p></div>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-wrap gap-1"><Badge className={diffColors[q.difficulty]}>{diffLabels[q.difficulty]}</Badge><Badge className="bg-muted text-muted-foreground text-[10px]">M{mod?.order}·L{lesson?.order}</Badge><Badge className={q.status === "ativa" ? "bg-green-100 text-green-700 text-[10px]" : "bg-muted text-muted-foreground text-[10px]"}>{q.status}</Badge></div>
@@ -2473,12 +2511,12 @@ function AdminPessoasScreen({ professors, setProfessors, students, setStudents, 
     <div className="flex flex-col flex-1 overflow-hidden">
       <TopBar title="Pessoas" />
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
-        <button onClick={() => setView("professores")} className="bg-card rounded-2xl border border-border p-4 text-left shadow-sm flex items-center gap-3 active:scale-[0.98]">
+        <button onClick={() => setView("professores")} className="bg-card rounded-2xl border border-border p-4 text-left flex items-center gap-3 active:scale-[0.98]">
           <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center"><UserCheck size={22} /></div>
           <div className="flex-1"><p className="font-bold text-sm">Professores</p><p className="text-xs text-muted-foreground">{professors.length} cadastro{professors.length !== 1 ? "s" : ""}</p></div>
           <ChevronRight size={16} className="text-muted-foreground" />
         </button>
-        <button onClick={() => setView("alunos")} className="bg-card rounded-2xl border border-border p-4 text-left shadow-sm flex items-center gap-3 active:scale-[0.98]">
+        <button onClick={() => setView("alunos")} className="bg-card rounded-2xl border border-border p-4 text-left flex items-center gap-3 active:scale-[0.98]">
           <div className="w-12 h-12 rounded-xl bg-green-100 text-green-700 flex items-center justify-center"><GraduationCap size={22} /></div>
           <div className="flex-1"><p className="font-bold text-sm">Alunos</p><p className="text-xs text-muted-foreground">{students.length} cadastro{students.length !== 1 ? "s" : ""}</p></div>
           <ChevronRight size={16} className="text-muted-foreground" />
@@ -2657,14 +2695,18 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center overflow-x-hidden" style={{ fontFamily: "'Figtree', sans-serif" }}>
+    <div className="min-h-[100dvh] bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center overflow-x-hidden" style={{ fontFamily: "'Figtree', sans-serif" }}>
       <style>{`
         @keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes notificationSheetIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes notificationOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+        .notification-sheet { animation: notificationSheetIn 220ms cubic-bezier(.22,1,.36,1); }
+        .notification-overlay { animation: notificationOverlayIn 180ms ease-out; }
         * { -webkit-tap-highlight-color: transparent; }
         input[type=range] { cursor: pointer; }
       `}</style>
 
-      <div className="relative w-full sm:w-[390px] h-screen sm:h-[844px] bg-background sm:rounded-[44px] overflow-hidden sm:shadow-2xl sm:shadow-black/60 sm:border-4 sm:border-slate-700 flex flex-col max-w-full">
+      <div className="relative w-full sm:w-[390px] h-[100dvh] sm:h-[min(844px,100dvh)] bg-background sm:rounded-[44px] overflow-hidden sm:border-4 sm:border-slate-700 flex flex-col max-w-full">
         {/* Dynamic Island */}
         <div className="hidden sm:flex absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[35px] bg-black rounded-full z-50 items-center justify-center gap-1.5">
           <div className="w-[10px] h-[10px] rounded-full bg-slate-800 border border-slate-700" />
@@ -2678,13 +2720,13 @@ export default function App() {
         {!role ? (
           <LoginScreen professors={professors} onLogin={(r, userId) => { setRole(r); if (userId) setCurrentProfessorId(userId); setTab("home"); setSubView(null); }} />
         ) : (
-          <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex min-h-0 flex-col flex-1 overflow-x-hidden overflow-y-hidden">
             {renderContent()}
             {showBottomNav && <BottomNav role={role} tab={tab} setTab={changeTab} />}
           </div>
         )}
 
-        <div className="hidden sm:flex h-7 shrink-0 items-end justify-center pb-2 bg-background">
+        <div className="hidden sm:flex h-5 shrink-0 items-end justify-center pb-1 bg-white">
           <div className="w-[130px] h-[5px] bg-foreground/20 rounded-full" />
         </div>
       </div>

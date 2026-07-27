@@ -120,12 +120,44 @@
 }
 
 @layer base {
+  *, .app-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.55) transparent;
+  }
+
+  *::-webkit-scrollbar, .app-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  *::-webkit-scrollbar-track, .app-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb, .app-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.52);
+    border-radius: 999px;
+  }
+
+  .notification-sheet {
+    font-family: 'Figtree', sans-serif;
+  }
+
+  .notification-sheet .font-extrabold {
+    font-weight: 600 !important;
+  }
+
+  .notification-sheet .font-semibold {
+    font-weight: 500 !important;
+  }
+
   * {
     @apply border-border outline-ring/50;
+    box-shadow: none !important;
   }
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
   }
 
   /**
@@ -133,8 +165,9 @@
   * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
   */
 
-  html {
+  html, #root {
     font-size: var(--font-size);
+    overflow-x: hidden;
   }
 
   h1 {
