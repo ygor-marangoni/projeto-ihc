@@ -296,6 +296,9 @@ function generatedExamUniqueKey(record: GeneratedExam) {
 function normalizeAppData(data: AppData): AppData {
   return {
     ...data,
+    professors: data.professors.map(professor => professor.name.toLowerCase().includes("mutoni")
+      ? { ...professor, name: "Carlos Eduardo Silva", email: "carlos.silva@aprender.edu.br", password: "Aprender@2024" }
+      : professor),
     attendance: keepLatestByKey(data.attendance, attendanceUniqueKey),
     dailyAssessments: keepLatestByKey(data.dailyAssessments, dailyAssessmentUniqueKey),
     periodic: keepLatestByKey(data.periodic, periodicAssessmentUniqueKey),
